@@ -2,7 +2,6 @@ package com.cput.traabcobusinessplatform.exception;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -10,14 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 
-@RestController
+@RestControllerAdvice
 public class GlobalExeptionHandler {
 
     @Getter
@@ -29,7 +28,7 @@ public class GlobalExeptionHandler {
         private final String message;
         private final String path;
 
-        private Map<String, String> fiedlErrors;
+        private Map<String, String> fieldErrors;
 
         public ApiError(HttpStatus httpStatus, String message, String path) {
             this.status = httpStatus.value();
@@ -38,7 +37,7 @@ public class GlobalExeptionHandler {
             this.path = path;
         }
         ApiError withFieldErrors(Map<String, String> fieldErrors){
-            this.fiedlErrors = fiedlErrors;
+            this.fieldErrors = fieldErrors;
             return this;
         }
     }
@@ -63,7 +62,7 @@ public class GlobalExeptionHandler {
     }
 
     ////404 Not Found
-    @ExceptionHandler({UserNotFoundException.class, ClientExceptions.ClientNotFoundException.class, ServiceExceptions.ServiceNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ClientNotFoundException.class})
     public ResponseEntity<ApiError> handleNotFound(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), req.getRequestURI()));
@@ -72,11 +71,7 @@ public class GlobalExeptionHandler {
     // ── 409 Conflict ──────────────────────────────────────────────────────
 
     @ExceptionHandler({
-            EmailAlreadyExistsException.class,
-            ClientEmailAlreadyExistsException.class,
-            RegistrationNumberAlreadyExistsException.class,
-            ServiceNameAlreadyExistsException.class,
-            ServiceHasActiveBookingsException.class
+            ClientEmailAlreadyExistsException.class
     })
     public ResponseEntity<ApiError> handleConflict(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -110,4 +105,3 @@ public class GlobalExeptionHandler {
                         "An unexpected error occurred. Please try again later.", req.getRequestURI()));
     }
 }
-
