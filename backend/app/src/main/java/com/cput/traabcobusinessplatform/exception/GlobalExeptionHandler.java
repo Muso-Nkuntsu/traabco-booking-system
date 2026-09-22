@@ -63,7 +63,7 @@ public class GlobalExeptionHandler {
     }
 
     ////404 Not Found
-    @ExceptionHandler({UserNotFoundException.class, ClientExceptions.ClientNotFoundException.class, ServiceExceptions.ServiceNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class})
     public ResponseEntity<ApiError> handleNotFound(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), req.getRequestURI()));
@@ -71,13 +71,6 @@ public class GlobalExeptionHandler {
 
     // ── 409 Conflict ──────────────────────────────────────────────────────
 
-    @ExceptionHandler({
-            EmailAlreadyExistsException.class,
-            ClientEmailAlreadyExistsException.class,
-            RegistrationNumberAlreadyExistsException.class,
-            ServiceNameAlreadyExistsException.class,
-            ServiceHasActiveBookingsException.class
-    })
     public ResponseEntity<ApiError> handleConflict(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ApiError(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI()));

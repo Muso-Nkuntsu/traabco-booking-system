@@ -1,14 +1,15 @@
 package com.cput.traabcobusinessplatform.users.dto;
 
 
-import lombok.Builder;
-import lombok.Getter;
+import com.cput.traabcobusinessplatform.users.domain.enums.UserRole;
+import lombok.*;
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
+ * Muso Nkuntsu
  * Represents the user data the server sends back to the client.
  * This is an outbound DTO — it goes out from the server, never comes in.
  * It deliberately excludes the password field so sensitive credentials
@@ -17,14 +18,18 @@ import java.time.LocalDateTime;
  */
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserResponse {
 
-    private final int userId;
-    private final String fullName;
-    private final String email;
-    private final String role;
-    private final LocalDateTime createdAt;
+    private  Long id;
+    private  String firstName;
+    private  String lastName;
+    private  String email;
+    private UserRole role;
+    private  LocalDateTime createdAt;
 
 
 }

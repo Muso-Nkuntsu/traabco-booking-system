@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
+ * Muso Nkuntsu
  * MapStruct mapper for the user module
  * Handles conversation between the User entity and its DTOs
  * sp the service layer never manually maps fields
@@ -20,6 +21,13 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "password", ignore = true)
     UserEntity toEntity(RegisterRequest request);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "firstName", source = "firstName")
+    @Mapping(target = "lastName", source = "lastName")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "role", source = "role")
+    @Mapping(target = "createdAt", source = "createdAt")
 
     UserResponse toResponse(UserEntity user);
 

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Represents the data a returning user submits when logging in.
@@ -15,7 +17,9 @@ import lombok.Getter;
  */
 
 @Getter
-@Builder
+@Setter
+@NoArgsConstructor
+
 public class LoginRequest {
 
     @NotBlank(message = "Email is required")
@@ -24,5 +28,4 @@ public class LoginRequest {
 
     @NotBlank(message = "Password is required")
     private  String password;
-
 }

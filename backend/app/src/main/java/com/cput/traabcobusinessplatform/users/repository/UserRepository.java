@@ -17,5 +17,4 @@ public interface UserRepository extends JpaRepository<UserEntity,Long> {
 
     Page<UserEntity> findByRole(UserRole role, Pageable pageable);
 
-    Page<UserEntity> findByIsActive(Boolean isActive, Pageable pageable);
 }
