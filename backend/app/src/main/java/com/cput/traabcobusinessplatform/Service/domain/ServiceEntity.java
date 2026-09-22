@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 /**Muso Nkuntsu-231223722
  * Entity class for my service package
+ *
  * */
 
 @Entity

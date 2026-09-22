@@ -6,7 +6,7 @@ import com.cput.traabcobusinessplatform.Service.dto.ServiceResponse;
 import java.util.List;
 
 /**Muso Nkuntsu-231223722
- *
+ *My Service interface
  * */
 
 
