@@ -12,6 +12,7 @@ import com.cput.traabcobusinessplatform.booking.repository.BookingRepository;
 import com.cput.traabcobusinessplatform.booking.service.BookingService;
 import com.cput.traabcobusinessplatform.client.domain.Client;
 import com.cput.traabcobusinessplatform.client.repository.ClientRepository;
+import com.cput.traabcobusinessplatform.engagement.service.EngagementService;
 import com.cput.traabcobusinessplatform.exception.ClientNotFoundException;
 import com.cput.traabcobusinessplatform.exception.ServiceNotFoundException;
 import com.cput.traabcobusinessplatform.exception.UserNotFoundException;
@@ -35,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
     private final ClientRepository clientRepository;
     private final ServiceOfferingRepository serviceOfferingRepository;
     private final UserRepository userRepository;
+    private final EngagementService engagementService;
 
     @Override
     public BookingResponse createBooking(BookingRequest request){
@@ -100,8 +102,7 @@ public class BookingServiceImpl implements BookingService {
         Booking updated = bookingRepository.save(booking);
 
         if (request.getStatus() == BookingStatus.CONFIRMED) {
-            // TODO: wire engagementService.createFromBooking() once Engagement module is built
-
+                engagementService.createFromBooking(updated.getId());
         }
         return bookingMapper.toResponse(updated);
     }
