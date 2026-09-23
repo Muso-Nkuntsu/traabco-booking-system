@@ -63,7 +63,12 @@ public class GlobalExeptionHandler {
     }
 
     ////404 Not Found
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            ClientNotFoundException.class,
+            ServiceNotFoundException.class,
+            BookingNotFoundException.class
+    })
     public ResponseEntity<ApiError> handleNotFound(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), req.getRequestURI()));
