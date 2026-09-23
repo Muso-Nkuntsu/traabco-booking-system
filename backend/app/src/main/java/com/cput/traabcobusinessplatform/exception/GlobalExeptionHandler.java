@@ -11,13 +11,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 
-@RestController
+@RestControllerAdvice
 public class GlobalExeptionHandler {
 
     @Getter
@@ -78,9 +79,12 @@ public class GlobalExeptionHandler {
 
     // ── 409 Conflict ──────────────────────────────────────────────────────
 
-    public ResponseEntity<ApiError> handleConflict(RuntimeException ex, HttpServletRequest req) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiError(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI()));
+    @ExceptionHandler(ClientEmailAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleConflict(ClientEmailAlreadyExistsException ex, HttpServletRequest req) {
+       return ResponseEntity.status(HttpStatus.CONFLICT)
+               .body(new ApiError(HttpStatus.CONFLICT,
+                       ex.getMessage(),
+                       req.getRequestURI()));
     }
 
     // ── @ResponseStatus annotated exceptions (422, etc.) ─────────────────
@@ -104,7 +108,8 @@ public class GlobalExeptionHandler {
     // ── 500 Catch-all ─────────────────────────────────────────────────────
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest req) {
+    public ResponseEntity<ApiError> handleGeneric(Exception ex,
+                                                  HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
                         "An unexpected error occurred. Please try again later.", req.getRequestURI()));

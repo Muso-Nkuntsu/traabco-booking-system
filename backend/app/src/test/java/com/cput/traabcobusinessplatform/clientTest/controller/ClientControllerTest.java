@@ -5,13 +5,16 @@ import com.cput.traabcobusinessplatform.client.controller.ClientController;
 import com.cput.traabcobusinessplatform.client.dto.ClientRequest;
 import com.cput.traabcobusinessplatform.client.dto.ClientResponse;
 import com.cput.traabcobusinessplatform.client.service.ClientService;
+import com.cput.traabcobusinessplatform.config.JwtUtil;
+import com.cput.traabcobusinessplatform.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
 import com.cput.traabcobusinessplatform.exception.ClientEmailAlreadyExistsException;
 import com.cput.traabcobusinessplatform.exception.ClientNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,23 +22,30 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Import(SecurityConfig.class)
 @WebMvcTest(ClientController.class)
 class ClientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockBean
+    @MockitoBean
     private ClientService clientService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private com.cput.traabcobusinessplatform.config.JwtAuthFilter jwtAuthFilter;
 
     private ClientRequest validRequest() {
         return ClientRequest.builder()
@@ -160,7 +170,7 @@ class ClientControllerTest {
     @Test
     void getAll_returns401_whenUnauthenticated() throws Exception {
         mockMvc.perform(get("/api/clients"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
 

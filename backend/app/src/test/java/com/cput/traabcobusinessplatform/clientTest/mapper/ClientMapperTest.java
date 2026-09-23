@@ -4,6 +4,8 @@ package com.cput.traabcobusinessplatform.clientTest.mapper;
 import com.cput.traabcobusinessplatform.client.dto.ClientRequest;
 import com.cput.traabcobusinessplatform.client.dto.ClientResponse;
 import com.cput.traabcobusinessplatform.client.domain.Client;
+import com.cput.traabcobusinessplatform.client.mapper.ClientMapper;
+import com.cput.traabcobusinessplatform.client.mapper.ClientMapperImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +68,7 @@ class ClientMapperTest {
 
         ClientResponse response = clientMapper.toResponse(entity);
 
-        assertThat(response.getid()).isEqualTo(1L);
+        assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getEmail()).isEqualTo("jane@acme.co.za");
         assertThat(response.getTaxNumber()).isEqualTo("TX12345");
         assertThat(response.getFirstName()).isEqualTo("Jane");
