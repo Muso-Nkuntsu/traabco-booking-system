@@ -80,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponse> getBookingsByClient(Long clientId){
-        return bookingRepository.findByClientId(clientId).stream()
+        return bookingRepository.findByClient_Clientid(clientId).stream()
                 .map(bookingMapper::toResponse)
                 .toList();
     }

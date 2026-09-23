@@ -67,7 +67,8 @@ public class GlobalExeptionHandler {
             UserNotFoundException.class,
             ClientNotFoundException.class,
             ServiceNotFoundException.class,
-            BookingNotFoundException.class
+            BookingNotFoundException.class,
+            PaymentNotFoundExcpetion.class
     })
     public ResponseEntity<ApiError> handleNotFound(RuntimeException ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
