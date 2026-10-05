@@ -22,8 +22,20 @@ export default function Login() {
   }, [registrationState]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    navigate('/dashboard');
+   e.preventDefault();
+
+    // 1. Check if the logging-in user is the TRAABCO staff member
+    if (email === 'admin@traabco.co.za' && password === 'admin123') {
+      alert("Welcome back, TRAABCO Administrator.");
+      
+      // Send them to the special Admin section
+      navigate('/admin');
+    } else {
+      alert(`Welcome back, ${email}!`);
+      
+      // Send standard business owners to their normal Client Account view
+      navigate('/dashboard');
+    }
   };
 
   return (

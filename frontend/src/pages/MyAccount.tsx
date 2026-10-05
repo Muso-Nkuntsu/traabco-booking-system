@@ -110,8 +110,9 @@ export default function MyAccount({
           {navItem("Profile", false, () => navigate('/profile'))}
           <div className="ma-nav-group">SERVICES</div>
           {navItem("Book a service", false, handleNewBookingClick)}
-          {navItem("Services", false, () => onNavigate?.("services"))}
-          {navItem("Engagements")}
+          {navItem("Services", false, () => navigate('/services'))}
+         {navItem("Engagements", false, () => navigate('/engagements'))}
+
           <div className="ma-nav-group">FINANCE</div>
           {navItem("Payments", false, () => onNavigate?.("payments"))}
         </nav>
@@ -130,7 +131,12 @@ export default function MyAccount({
         <div className="ma-title-row">
           <h1 className="ma-title">My account</h1>
           <div className="ma-title-actions">
-            <button type="button" className="ma-text-btn">
+            
+             <button 
+              type="button" 
+              className="ma-text-btn"
+              onClick={() => navigate('/profile')}
+            >
               Edit profile
             </button>
             <button

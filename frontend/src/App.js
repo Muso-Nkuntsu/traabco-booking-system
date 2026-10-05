@@ -8,10 +8,13 @@ import PaymentDetail from "./pages/PaymentDetail";
 import MyAccount from "./pages/MyAccount";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import ServicesCatalog from "./pages/ServicesCatalog";
+import Engagements from "./pages/Engagements";
+import AdminDashboard from "./pages/AdminDashboard"; // 1. Imported Admin Dashboard file
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
-
+// Import registration sub-pages
 import RegisterBusinessDetails from "./pages/RegisterBusinessDetails";
 import RegisterContactPerson from "./pages/RegisterContactPerson";
 import RegisterPassword from "./pages/RegisterPassword";
@@ -39,25 +42,36 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*Profile Routing */}
-        <Route path="/profile" element={
-  <Profile 
-    businessName={businessName} setBusinessName={setBusinessName}
-    industry={industry} setIndustry={setIndustry}
-    cipcNumber={cipcNumber} setCipcNumber={setCipcNumber}
-    vatNumber={vatNumber} setVatNumber={setVatNumber}
-    address={address} setAddress={setAddress}
-    townCity={townCity} setTownCity={setTownCity}
-    fullName={fullName} setFullName={setFullName}
-    position={position} setPosition={setPosition}
-    email={email}
-    phone={phone} setPhone={setPhone}
-  />
-} />
-
-
-        {/*Profile routing  */}
+        {/* Gateway Authentication Routes */}
         <Route path="/" element={<Login />} />
+        
+        {/* 2. Added the Master Admin Management Route Link Mapping */}
+        <Route 
+          path="/admin" 
+          element={<AdminDashboard bookings={userBookings} setBookings={setUserBookings} />} 
+        />
+
+        {/* Client Side Dashboards */}
+        <Route path="/dashboard" element={<MyAccount bookings={userBookings} />} />
+        <Route path="/services" element={<ServicesCatalog />} />
+        <Route path="/engagements" element={<Engagements />} />
+        
+        <Route path="/profile" element={
+          <Profile 
+            businessName={businessName} setBusinessName={setBusinessName}
+            industry={industry} setIndustry={setIndustry}
+            cipcNumber={cipcNumber} setCipcNumber={setCipcNumber}
+            vatNumber={vatNumber} setVatNumber={setVatNumber}
+            address={address} setAddress={setAddress}
+            townCity={townCity} setTownCity={setTownCity}
+            fullName={fullName} setFullName={setFullName}
+            position={position} setPosition={setPosition}
+            email={email}
+            phone={phone} setPhone={setPhone}
+          />
+        } />
+
+        {/* Registration Workflow Steps */}
 
 <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -76,8 +90,6 @@ function App() {
             servicesNeeded={servicesNeeded} setServicesNeeded={setServicesNeeded}
           />
         } />
-
-        {/* Step 2 Route */}
         <Route path="/register/contact" element={
           <RegisterContactPerson 
             fullName={fullName} setFullName={setFullName}
@@ -86,8 +98,6 @@ function App() {
             phone={phone} setPhone={setPhone}
           />
         } />
-
-        {/* Step 3 Route */}
         <Route path="/register/password" element={
           <RegisterPassword 
             businessName={businessName} fullName={fullName} email={email}
@@ -96,6 +106,7 @@ function App() {
           />
         } />
 
+        {/* Consultation Action Workspaces */}
         <Route path="/book" element={<BookAService bookings={userBookings} setBookings={setUserBookings} />} />
         <Route path="/payments/:bookingId" element={<PaymentDetail bookings={userBookings} />} />
         <Route path="/book/success" element={<BookingSuccess />} />
