@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // 1. Added useLocation
-// @ts-ignore
 import '../App.css'
 
 export default function Login() {

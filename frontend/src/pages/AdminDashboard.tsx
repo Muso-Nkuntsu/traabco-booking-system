@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import '../App.css';
+import { Booking } from '../types';
+import { formatRand } from '../data/services';
 
 // 1. Declare the props interface to receive global bookings data from App.js
 interface AdminDashboardProps {
-  bookings: any[];
-  setBookings: React.Dispatch<React.SetStateAction<any[]>>;
+  bookings: Booking[];
+  setBookings: Dispatch<SetStateAction<Booking[]>>;
+  clientName: string;
 }
 
-export default function AdminDashboard({ bookings, setBookings }: AdminDashboardProps) {
+export default function AdminDashboard({ bookings, setBookings, clientName }: AdminDashboardProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'All' | 'Pending' | 'Confirmed'>('All');
 
@@ -17,7 +19,7 @@ export default function AdminDashboard({ bookings, setBookings }: AdminDashboard
   const handleConfirmBooking = (reference: string) => {
     setBookings((prevBookings) =>
       prevBookings.map((b) =>
-        b.reference === reference ? { ...b, status: 'Confirmed' } : b
+        b.reference === reference ? { ...b, status: 'Confirmed' as const } : b
       )
     );
     alert(`Booking ${reference} has been officially Confirmed!`);
@@ -31,6 +33,7 @@ export default function AdminDashboard({ bookings, setBookings }: AdminDashboard
   });
 
   const pendingCount = bookings.filter((b) => b.status === 'Pending').length;
+  const confirmedCount = bookings.filter((b) => b.status === 'Confirmed').length;
 
   return (
     <div className="rb-page">
@@ -69,7 +72,7 @@ export default function AdminDashboard({ bookings, setBookings }: AdminDashboard
               className={`ma-tab ${activeTab === tab ? 'is-active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab} Bookings ({tab === 'All' ? bookings.length : tab === 'Pending' ? pendingCount : bookings.length - pendingCount})
+              {tab} Bookings ({tab === 'All' ? bookings.length : tab === 'Pending' ? pendingCount : confirmedCount})
             </button>
           ))}
         </div>
@@ -94,10 +97,10 @@ export default function AdminDashboard({ bookings, setBookings }: AdminDashboard
                       <span className="pd-label" style={{ fontSize: '9px', background: '#e2e8f0', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
                         {b.service}
                       </span>
-                      <span style={{ fontSize: '11px', color: '#666' }}>Fee: R {b.fee}.00</span>
+                      <span style={{ fontSize: '11px', color: '#666' }}>Fee: {formatRand(b.fee)}</span>
                     </div>
                     <p style={{ margin: '2px 0', fontSize: '12px', color: '#222' }}>
-                      <strong>Client Profile:</strong> Kaya Spaza Shop
+                      <strong>Client Profile:</strong> {clientName}
                     </p>
                     <p style={{ margin: '2px 0', fontSize: '11px', color: '#555' }}>
                       <strong>Schedule Timeline:</strong> {b.date} &middot; {b.time} &middot; Assigned Consultant: {b.consultant}

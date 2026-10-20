@@ -1,70 +1,46 @@
-# Getting Started with Create React App
+# TRAABCO Business Platform — Frontend (wireframes)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React + TypeScript client portal for **Tacks Registered Accountants & Business Consultants (TRAABCO)**, Mthatha.
+Built with Create React App (`react-scripts` 5) and React Router 7.
 
-## Available Scripts
+## Run it
 
-In the project directory, you can run:
+```bash
+npm install
+npm start        # http://localhost:3000
+npm test         # runs src/App.test.js
+npm run build    # production build in /build
+```
 
-### `npm start`
+## Screens and routes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Route | Screen |
+|---|---|
+| `/` | Sign in (`admin@traabco.co.za` / `admin123` opens the admin board; anything else opens the client account) |
+| `/register` → `/register/contact` → `/register/password` | 3-step business registration |
+| `/forgot-password` → `/reset-password` | Password recovery |
+| `/dashboard` | My account — bookings list with status filters |
+| `/profile` | Edit business, contact and password details |
+| `/services` | Service catalogue ("Book Now" pre-selects the service) |
+| `/book` → `/book/success` or `/book/failed` | Book a service |
+| `/payments/:bookingId` | Payment details for one booking |
+| `/engagements` | Compliance / assurance engagement tracker |
+| `/admin` | Admin scheduling board — confirm pending bookings |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project layout
 
-### `npm test`
+```
+src/
+  App.js                 routes + shared state (registration details, bookings)
+  data/services.ts       the one list of services, fees and consultants
+  types/index.ts         shared types (Service, Booking, …)
+  utils/password.ts      password rules used by register, profile and reset
+  component/             ConfirmBookingModal
+  pages/                 one file per screen
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Wireframe limitations (until the Spring Boot backend is connected)
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Sign-in is not checked against real accounts, and `/admin` is not protected.
+- Bookings live in memory only — refreshing the browser clears them.
+- Booking submission is simulated and fails ~30% of the time on purpose so the failure screen can be tested (`fakeSubmitBooking` in `BookAService.tsx`).

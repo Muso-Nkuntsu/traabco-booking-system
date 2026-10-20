@@ -1,20 +1,21 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState, Dispatch, SetStateAction } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmBookingModal from '../component/ConfirmBookingModal';
-import { Service, BookingDraft } from '../types';
-
-const services: Service[] = [
-  { id: 'acc', name: 'Accounting & bookkeeping', durationMinutes: 90, fee: 2200, consultant: 'L. Takatshana' },
-  { id: 'tax', name: 'Tax services', durationMinutes: 60, fee: 1800, consultant: 'T. Jikijela' },
-  { id: 'con', name: 'Business consulting', durationMinutes: 60, fee: 2800, consultant: 'L. Takatshana' },
-  { id: 'aud', name: 'Auditing & review', durationMinutes: 120, fee: 3200, consultant: 'N. Mhlontlo' },
-];
+import { Service, BookingDraft, Booking } from '../types';
+import services, { findService, formatRand } from '../data/services';
 
 const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 const quickTimes = ['09:00', '10:00', '13:00', '14:00', '15:00'];
+
+// Builds a reference that won't repeat within a session, e.g. BK-2026-483920.
+function makeReference(): string {
+  const year = new Date().getFullYear();
+  const stamp = Date.now().toString().slice(-6);
+  return `BK-${year}-${stamp}`;
+}
 
 // TODO: replace with a real API call once the backend exists.
 // Deliberately "fails" ~30% of the time so both the success and failed
@@ -25,7 +26,7 @@ function fakeSubmitBooking(): Promise<{ ok: boolean; reference?: string; reason?
       if (Math.random() < 0.3) {
         resolve({ ok: false, reason: 'The selected slot was just taken by another client.' });
       } else {
-        resolve({ ok: true, reference: `BK-2026-${Math.floor(100 + Math.random() * 900)}` });
+        resolve({ ok: true, reference: makeReference() });
       }
     }, 800);
   });
@@ -56,16 +57,16 @@ function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
-export default function BookAService({ setBookings }: { setBookings: React.Dispatch<React.SetStateAction<any[]>> }) {
+interface BookAServiceProps {
+  setBookings: Dispatch<SetStateAction<Booking[]>>;
+}
 
+export default function BookAService({ setBookings }: BookAServiceProps) {
   const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState<Service | null>(services[0]);
-  const [viewYear, setViewYear] = useState(2026);
-  const [viewMonth, setViewMonth] = useState(4); // 0-indexed: 4 = May
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 4, 26));
-  const [selectedTime, setSelectedTime] = useState<string>('10:00');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const location = useLocation();
+
+  // "Book Now" on the Services page passes the chosen service id in navigation state.
+  const autoSelectId = (location.state as { autoSelectId?: string } | null)?.autoSelectId;
 
   const today = useMemo(() => {
     const t = new Date();
@@ -73,9 +74,24 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
     return t;
   }, []);
 
+  const [selectedService, setSelectedService] = useState<Service | null>(
+    findService(autoSelectId) ?? services[0]
+  );
+  // Open the calendar on the current month, with no date picked yet,
+  // so a past date can never be submitted by default.
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>('10:00');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const calendarCells = useMemo(() => buildCalendarCells(viewYear, viewMonth), [viewYear, viewMonth]);
 
+  const viewingCurrentMonth = viewYear === today.getFullYear() && viewMonth === today.getMonth();
+
   const goToPrevMonth = () => {
+    if (viewingCurrentMonth) return; // nothing bookable in past months
     setSelectedDate(null);
     if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
     else setViewMonth((m) => m - 1);
@@ -87,7 +103,7 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
     else setViewMonth((m) => m + 1);
   };
 
-  const canConfirm = !!selectedService && !!selectedDate && !!selectedTime;
+  const canConfirm = !!selectedService && !!selectedDate && !!selectedTime && selectedDate >= today;
 
   const draft: BookingDraft | null = canConfirm
     ? {
@@ -98,28 +114,29 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
     : null;
 
   const handleConfirm = async () => {
+    if (!draft || !selectedService) return;
     setSubmitting(true);
     const result = await fakeSubmitBooking();
     setSubmitting(false);
     setModalOpen(false);
 
     if (result.ok) {
-        const newBooking = {
-        reference: result.reference || `BK-2026-${Math.floor(100 + Math.random() * 900)}`,
-        service: selectedService?.name || "Consulting Service",
-        scope: selectedService?.consultant || "General Session Parameter",
-        date: selectedDate ? selectedDate.toDateString() : "Today",
-        time: selectedTime,
-        location: "83 Madeira St, Mthatha",
-        consultant: selectedService?.consultant || "L. Takatshana",
-        fee: selectedService?.fee || 2200,
-        status: "Pending" as const
+      const reference = result.reference || makeReference();
+      const newBooking: Booking = {
+        reference,
+        serviceId: selectedService.id,
+        service: selectedService.name,
+        scope: `${selectedService.durationMinutes}-minute session`,
+        date: draft.date,
+        time: draft.time,
+        location: '83 Madeira St, Mthatha',
+        consultant: selectedService.consultant,
+        fee: selectedService.fee,
+        status: 'Pending',
       };
-      
-      // Update the shared list array:
+
       setBookings((prev) => [newBooking, ...prev]);
-      
-      navigate('/book/success', { state: { ...draft, reference: result.reference } });
+      navigate('/book/success', { state: { ...draft, reference } });
     } else {
       navigate('/book/failed', { state: { reason: result.reason } });
     }
@@ -128,7 +145,7 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
   return (
     <div className="page">
       <h1>Book a service</h1>
-      <p className="subtitle">Choose a service and pick a date and time — no separate confirmation step needed</p>
+      <p className="subtitle">Choose a service, pick a date and time, then confirm your request</p>
 
       <p className="step-title"><span className="step-num">1</span>Choose a service</p>
       <div className="service-grid">
@@ -141,7 +158,7 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
           >
             <p className="service-name">{service.name}</p>
             <p className="service-meta">
-              {service.durationMinutes} min · R {service.fee.toLocaleString()}.00
+              {service.durationMinutes} min · {formatRand(service.fee)}
             </p>
             <p className="service-meta">{service.consultant}</p>
           </button>
@@ -152,7 +169,7 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
       <div className="booking-columns">
         <div className="calendar-panel">
           <div className="calendar-nav">
-            <button type="button" onClick={goToPrevMonth}>← Prev</button>
+            <button type="button" onClick={goToPrevMonth} disabled={viewingCurrentMonth}>← Prev</button>
             <p>{monthNames[viewMonth]} {viewYear}</p>
             <button type="button" onClick={goToNextMonth}>Next →</button>
           </div>
@@ -202,18 +219,21 @@ export default function BookAService({ setBookings }: { setBookings: React.Dispa
             ))}
           </div>
 
-          {draft && (
+          {draft ? (
             <div className="summary-card">
               <div className="summary-row"><span>Service</span><span>{draft.service.name}</span></div>
               <div className="summary-row"><span>Date</span><span>{draft.date}</span></div>
               <div className="summary-row"><span>Time</span><span>{draft.time}</span></div>
-              <div className="summary-row"><span>Fee</span><span>R {draft.service.fee}.00</span></div>
+              <div className="summary-row"><span>Fee</span><span>{formatRand(draft.service.fee)}</span></div>
             </div>
+          ) : (
+            <p className="subtitle" style={{ marginTop: 14 }}>Select a date on the calendar to see your booking summary.</p>
           )}
         </div>
       </div>
 
-      <div className="button-row" style={{ justifyContent: 'flex-end' }}>
+      <div className="button-row" style={{ justifyContent: 'space-between' }}>
+        <button type="button" onClick={() => navigate('/dashboard')}>← Back to my account</button>
         <button
           type="button"
           className="btn-primary"

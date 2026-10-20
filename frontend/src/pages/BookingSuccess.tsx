@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-  import { ConfirmedBooking } from '../types';
+import { ConfirmedBooking } from '../types';
+import { formatRand } from '../data/services';
 
 export default function BookingSuccess() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function BookingSuccess() {
         <div className="summary-row"><span>Service</span><span>{state.service.name}</span></div>
         <div className="summary-row"><span>Date</span><span>{state.date} · {state.time}</span></div>
         <div className="summary-row"><span>Consultant</span><span>{state.service.consultant}</span></div>
-        <div className="summary-row"><span>Fee</span><span>R {state.service.fee}.00 · payable at session</span></div>
+        <div className="summary-row"><span>Fee</span><span>{formatRand(state.service.fee)} · payable at session</span></div>
       </div>
 
       <div className="pending-banner">
@@ -39,7 +40,7 @@ export default function BookingSuccess() {
       </div>
 
       <div className="button-row">
-        <button type="button" className="btn-primary" onClick={() => navigate('/')}>
+        <button type="button" className="btn-primary" onClick={() => navigate('/dashboard')}>
           Back to my account
         </button>
         <button type="button" onClick={() => navigate(`/payments/${state.reference}`)}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-//@ts-ignore
 import '../App.css';
+import { checkPassword, passwordProblems } from '../utils/password';
 
 interface Step3Props {
   businessName: string;
@@ -22,8 +22,9 @@ export default function RegisterPassword({
       alert("Passwords do not match!");
       return;
     }
-    if (password.length < 6) {
-      alert("Security warning: Password must be at least 6 characters long.");
+    const problem = passwordProblems(password);
+    if (problem) {
+      alert(problem);
       return;
     }
 
@@ -55,7 +56,13 @@ export default function RegisterPassword({
               <div className="rb-input-group">
                 <label htmlFor="rb-pass">Account password <span className="rb-required">*</span></label>
                 <input id="rb-pass" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                <span className="rb-helper-text">Create a password to access your secure client portal layout</span>
+                <span className="rb-helper-text">
+                  {checkPassword(password).map((r) => (
+                    <span key={r.label} style={{ display: 'block', color: r.met ? '#2b5a1f' : '#777' }}>
+                      {r.met ? '✓' : '○'} {r.label}
+                    </span>
+                  ))}
+                </span>
               </div>
               <div className="rb-input-group">
                 <label htmlFor="rb-confirm">Confirm password <span className="rb-required">*</span></label>

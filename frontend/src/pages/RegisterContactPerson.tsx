@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-//@ts-ignore
 import '../App.css';
 
 interface Step2Props {

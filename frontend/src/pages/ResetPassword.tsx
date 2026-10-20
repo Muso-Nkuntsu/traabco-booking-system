@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-// @ts-ignore
 import '../App.css';
+import { checkPassword } from '../utils/password';
 
 const LINK_LIFETIME_MINUTES = 23; // replace with the real expiry from your API
 
@@ -20,15 +20,7 @@ export default function ResetPassword() {
     return () => clearInterval(id);
   }, []);
 
-  const rules = useMemo(
-    () => [
-      { label: 'At least 8 characters', met: password.length >= 8 },
-      { label: 'One uppercase letter (A–Z)', met: /[A-Z]/.test(password) },
-      { label: 'One number (0–9)', met: /[0-9]/.test(password) },
-      { label: 'One special character (!@#$%)', met: /[^A-Za-z0-9]/.test(password) },
-    ],
-    [password]
-  );
+  const rules = useMemo(() => checkPassword(password), [password]);
 
   const metCount = rules.filter((r) => r.met).length;
   const strength =

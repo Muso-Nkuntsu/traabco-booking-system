@@ -157,7 +157,7 @@ export default function ForgotPassword() {
               <button
                 type="button"
                 className="au-btn"
-                onClick={() => navigate("/reset-password")}
+                onClick={() => navigate("/reset-password", { state: { email } })}
               >
                 Continue to Reset Password
               </button>

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import '../App.css';
 
 interface EngagementRecord {

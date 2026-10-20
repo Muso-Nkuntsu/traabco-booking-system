@@ -1,29 +1,15 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// @ts-ignore
-import '../App.css'
+import '../App.css';
+import { Booking, BookingStatus } from "../types";
 
-export type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
-
-export interface Booking {
-  reference: string;
-  service: string;
-  scope: string;
-  date: string;
-  time: string;
-  location: string;
-  consultant: string;
-  fee: number;
-  status: BookingStatus;
-}
+export type { Booking, BookingStatus };
 
 export interface MyAccountProps {
   clientName?: string;
   clientMeta?: string;
   clientEmail?: string;
   bookings?: Booking[];
-  onViewBooking?: (b: Booking) => void;
-  onNavigate?: (target: "account" | "payments" | "services") => void;
 }
 
 const FILTERS = ["All", "Pending", "Confirmed", "Completed", "Cancelled"] as const;
@@ -48,7 +34,6 @@ export default function MyAccount({
   clientMeta = "Retail \u00b7 Mthatha \u00b7 047 531 0010",
   clientEmail = "owner@kayaspaza.co.za",
   bookings = [], // Default to an empty array so random placeholders disappear completely
-  onNavigate,
 }: MyAccountProps) {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<Filter>("All");
@@ -78,8 +63,12 @@ export default function MyAccount({
   const visible =
     filter === "All" ? bookings : bookings.filter((b) => b.status === filter);
 
-  const initials = clientName
+  // Payments opens the selected booking, or the most recent one.
+  const paymentsTarget = selected ?? bookings[0]?.reference ?? null;
+
+  const initials = (clientName || "?")
     .split(" ")
+    .filter(Boolean)
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
@@ -104,9 +93,9 @@ export default function MyAccount({
           <div className="ma-brand-sub">Mthatha, EC</div>
         </div>
         <nav className="ma-nav">
-          {navItem("Dashboard")}
+          {navItem("Dashboard", false, () => navigate('/dashboard'))}
           <div className="ma-nav-group">ACCOUNT</div>
-          {navItem("My account", true, () => onNavigate?.("account"))}
+          {navItem("My account", true, () => navigate('/dashboard'))}
           {navItem("Profile", false, () => navigate('/profile'))}
           <div className="ma-nav-group">SERVICES</div>
           {navItem("Book a service", false, handleNewBookingClick)}
@@ -114,16 +103,18 @@ export default function MyAccount({
          {navItem("Engagements", false, () => navigate('/engagements'))}
 
           <div className="ma-nav-group">FINANCE</div>
-          {navItem("Payments", false, () => onNavigate?.("payments"))}
+          {paymentsTarget
+            ? navItem("Payments", false, () => navigate(`/payments/${paymentsTarget}`))
+            : navItem("Payments (no bookings yet)", false, handleNewBookingClick)}
+          <div className="ma-nav-group">SESSION</div>
+          {navItem("Sign out", false, () => navigate('/'))}
         </nav>
       </aside>
 
       {/* Main Panel Content */}
       <main className="ma-main">
         <div className="ma-crumbs">
-          <a className="ma-crumb-link" href="#dashboard">
-            {"\u2190"} Dashboard
-          </a>
+          <span>Dashboard</span>
           <span className="ma-crumb-sep">/</span>
           <span>My account</span>
         </div>
@@ -219,7 +210,18 @@ export default function MyAccount({
                         </span>
                       </div>
                       <div className="ma-service-title">{b.service}</div>
-                      <div className="ma-booking-meta">{b.date} at {b.time}</div>
+                      <div className="ma-booking-meta">{b.date} at {b.time} · {b.consultant}</div>
+                      <button
+                        type="button"
+                        className="ma-text-btn"
+                        style={{ marginTop: 6, padding: 0 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/payments/${b.reference}`);
+                        }}
+                      >
+                        Payment details →
+                      </button>
                     </div>
                   ))
                 )}

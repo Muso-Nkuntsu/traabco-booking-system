@@ -39,6 +39,9 @@ function App() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Details shown on My Account, built from what was entered at registration
+  const clientMeta = [industry, townCity, phone].filter(Boolean).join(' · ');
+
   return (
     <BrowserRouter>
       <Routes>
@@ -48,11 +51,18 @@ function App() {
         {/* 2. Added the Master Admin Management Route Link Mapping */}
         <Route 
           path="/admin" 
-          element={<AdminDashboard bookings={userBookings} setBookings={setUserBookings} />} 
+          element={<AdminDashboard bookings={userBookings} setBookings={setUserBookings} clientName={businessName} />} 
         />
 
         {/* Client Side Dashboards */}
-        <Route path="/dashboard" element={<MyAccount bookings={userBookings} />} />
+        <Route path="/dashboard" element={
+          <MyAccount
+            bookings={userBookings}
+            clientName={businessName}
+            clientMeta={clientMeta}
+            clientEmail={email || 'owner@kayaspaza.co.za'}
+          />
+        } />
         <Route path="/services" element={<ServicesCatalog />} />
         <Route path="/engagements" element={<Engagements />} />
         
@@ -71,13 +81,11 @@ function App() {
           />
         } />
 
+        {/* Password recovery */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         {/* Registration Workflow Steps */}
-
-<Route path="/forgot-password" element={<ForgotPassword />} />
-
-<Route path="/reset-password" element={<ResetPassword />} />
-
-<Route path="/dashboard" element={<MyAccount bookings={userBookings} />} />
         {/* Step 1 Route */}
         <Route path="/register" element={
           <RegisterBusinessDetails 
@@ -107,8 +115,8 @@ function App() {
         } />
 
         {/* Consultation Action Workspaces */}
-        <Route path="/book" element={<BookAService bookings={userBookings} setBookings={setUserBookings} />} />
-        <Route path="/payments/:bookingId" element={<PaymentDetail bookings={userBookings} />} />
+        <Route path="/book" element={<BookAService setBookings={setUserBookings} />} />
+        <Route path="/payments/:bookingId" element={<PaymentDetail bookings={userBookings} businessName={businessName} />} />
         <Route path="/book/success" element={<BookingSuccess />} />
         <Route path="/book/failed" element={<BookingFailed />} />
       </Routes>

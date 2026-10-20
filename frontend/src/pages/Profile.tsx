@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import '../App.css';
+import { passwordProblems } from '../utils/password';
 
 // 1. Structure the incoming data properties passed down from App.js states
 interface ProfileProps {
@@ -31,9 +31,20 @@ export default function Profile({
 
   const handleSaveChanges = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword && newPassword !== confirmNewPassword) {
-      alert("Security Error: New passwords do not match!");
-      return;
+    if (newPassword) {
+      if (!currentPassword) {
+        alert("Please enter your current password to set a new one.");
+        return;
+      }
+      if (newPassword !== confirmNewPassword) {
+        alert("Security Error: New passwords do not match!");
+        return;
+      }
+      const problem = passwordProblems(newPassword);
+      if (problem) {
+        alert(problem);
+        return;
+      }
     }
     alert("Profile settings and compliance records updated successfully!");
     navigate('/dashboard');

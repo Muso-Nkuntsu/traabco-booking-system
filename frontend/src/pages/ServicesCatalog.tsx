@@ -1,57 +1,6 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
 import '../App.css';
-
-// 1. Re-use your primary Service interface structure to maintain data consistency
-interface ServiceItem {
-  id: string;
-  name: string;
-  category: 'Accounting' | 'Tax' | 'Consulting';
-  durationMinutes: number;
-  fee: number;
-  consultant: string;
-  description: string;
-}
-
-const availableServices: ServiceItem[] = [
-  {
-    id: 'acc',
-    name: 'Accounting & Bookkeeping',
-    category: 'Accounting',
-    durationMinutes: 90,
-    fee: 2200,
-    consultant: 'L. Takatshana',
-    description: 'Compilation of monthly management accounts, general trial balances, ledger maintenance, and financial record auditing structures.'
-  },
-  {
-    id: 'aud',
-    name: 'Auditing & Independent Review',
-    category: 'Accounting',
-    durationMinutes: 120,
-    fee: 3200,
-    consultant: 'N. Mhlontlo',
-    description: 'Formal company independent review engagement, assurance checks, compliance verification, and substantive financial statement reviews.'
-  },
-  {
-    id: 'tax',
-    name: 'Tax Services & Returns',
-    category: 'Tax',
-    durationMinutes: 60,
-    fee: 1800,
-    consultant: 'T. Jikijela',
-    description: 'SARS compliance preparation, provisional tax returns, CIT/PIT calculations, and electronic filing declaration handoffs.'
-  },
-  {
-    id: 'con',
-    name: 'Business Consulting',
-    category: 'Consulting',
-    durationMinutes: 60,
-    fee: 2800,
-    consultant: 'L. Takatshana',
-    description: 'Strategic planning sessions, operational framework modeling, performance advisory, and corporate systems restructuring advice.'
-  }
-];
+import availableServices, { formatRand } from '../data/services';
 
 export default function ServicesCatalog() {
   const navigate = useNavigate();
@@ -98,7 +47,7 @@ export default function ServicesCatalog() {
                     {srv.category}
                   </span>
                   <span className="service-meta" style={{ fontWeight: 600, color: '#111' }}>
-                    R {srv.fee.toLocaleString()}.00
+                    {formatRand(srv.fee)}
                   </span>
                 </div>
                 
